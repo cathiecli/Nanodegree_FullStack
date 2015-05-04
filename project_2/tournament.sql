@@ -5,17 +5,11 @@
 --
 
 -- PostgreSQL: IF EXISTS - Do not throw an error if the table does not exist. A notice is issued in this case.
-DROP VIEW IF EXISTS player_matches;
-DROP VIEW IF EXISTS player1_matches;
-DROP VIEW IF EXISTS player2_matches;
-DROP VIEW IF EXISTS player_standings;
-DROP VIEW IF EXISTS swiss_pairings;
-DROP VIEW IF EXISTS standings;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS players;
 
 -------- 1. TABLE -----------------------------------------------------------------------------
-\echo ' -- 1. Create Table -- '
+\echo ' -- 1. Create Tables -- '
 -- create players table
 CREATE TABLE players ( name TEXT,                     
                        id SERIAL primary key);
@@ -27,7 +21,7 @@ CREATE TABLE matches ( seq_id SERIAL primary key,
                        win_id SERIAL references players(id));
 
 -------- 2. TABLE DATA ------------------------------------------------------------------------
-\echo ' -- 2. Insert Data -- '
+\echo ' -- 2. Insert Testing Data -- '
 -- insert data into players table
 --INSERT INTO players VALUES ('John', nextval('players_id_seq'));
 --INSERT INTO players VALUES ('Smith', nextval('players_id_seq'));
@@ -67,14 +61,14 @@ SELECT nextval('matches_seq_id_seq');
 -------- 3. VIEW ----------------------------------------------------------------------------
 \echo ' -- 3. Create View -- '
 -- Query to get the number of matches the player has won, used as a subquery in view
---CREATE VIEW player_standings AS
+--CREATE OR REPLACE VIEW player_standings AS
 --SELECT a.id, a.name, COUNT(b.win_id) AS wins
 --  FROM players a JOIN matches b ON a.id = b.win_id
 --GROUP BY a.id, a.name, b.win_id
 --ORDER BY wins;
 
 -- Query to get player1's number of matches the player has played
---CREATE VIEW player1_matches AS
+--CREATE OR REPLACE VIEW player1_matches AS
 --SELECT a.id, a.name, COUNT(b.player1) AS player_cnt
 --FROM players a JOIN matches b ON a.id = b.player1
 --GROUP BY a.id, a.name, b.player1;
@@ -83,7 +77,7 @@ SELECT nextval('matches_seq_id_seq');
 --FROM player1_matches;
 
 -- Query to get player2's number of matches the player has played
---CREATE VIEW player2_matches AS
+--CREATE OR REPLACE VIEW player2_matches AS
 --SELECT a.id, a.name, COUNT(b.player2) AS player_cnt
 --FROM players a JOIN matches b ON a.id = b.player2
 --GROUP BY a.id, a.name, b.player2;
@@ -92,7 +86,7 @@ SELECT nextval('matches_seq_id_seq');
 --FROM player2_matches;
 
 -- Query to get the number of matches the player has played
---CREATE VIEW player_matches AS
+--CREATE OR REPLACE VIEW player_matches AS
 --SELECT a.id, a.name, COUNT(b.player1) AS player_cnt
 --FROM players a JOIN matches b ON a.id = b.player1
 --GROUP BY a.id, a.name, b.player1
@@ -111,9 +105,9 @@ SELECT nextval('matches_seq_id_seq');
 --FROM player_standings a JOIN player_matches b ON a.id = b.id
 --GROUP BY a.id, a.name, a.wins;
 
--- create view standings to be used by playerStandings()
-CREATE VIEW standings AS
-SELECT a.id, a.name, a.wins, SUM(player_cnt) AS player_match
+-- create view standings to be used by playerStandings() and swissPairings()
+CREATE OR REPLACE VIEW standings AS
+SELECT a.id, a.name, a.wins, SUM(player_cnt) AS player_match, ROW_NUMBER() OVER (ORDER BY a.wins DESC)
 FROM (
 	SELECT a.id, a.name, COUNT(b.win_id) AS wins
   	  FROM players a LEFT JOIN matches b ON a.id = b.win_id
@@ -127,13 +121,6 @@ FROM (
 	  FROM players a LEFT JOIN matches b ON a.id = b.player2
   GROUP BY a.id, a.name, b.player2) b ON a.id = b.id
   GROUP BY a.id, a.name, a.wins
-  ORDER BY a.wins;
+  ORDER BY a.wins DESC;
 
 SELECT * FROM standings;
-
--- create view swiss_pairings to be used by swissPairings()
-CREATE VIEW swiss_pairings AS
-SELECT p1.player1 AS id1, a.name AS name1, p1.player2 AS id2, b.name AS name2
-  FROM matches p1 JOIN players a ON p1.player1 = a.id JOIN players b ON p1.player2 = b.id;
-
-SELECT * FROM swiss_pairings;

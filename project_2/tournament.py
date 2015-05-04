@@ -107,8 +107,10 @@ def swissPairings():
     """
     conn = connect()
     c = conn.cursor()
-    c.execute('SELECT id1, name1, id2, name2 FROM swiss_pairings;')
+    c.execute('SELECT o.id AS id1, o.name AS name1, e.id AS id2, e.name AS name2 \
+                 FROM (SELECT * FROM standings WHERE MOD(row_number, 2) = 1) AS o, \
+                      (SELECT * FROM standings WHERE MOD(row_number, 2) = 0) AS e \
+                WHERE o.row_number + 1 = e.row_number;')
     result = c.fetchall()
     conn.close()
     return result
-

@@ -113,8 +113,10 @@ def testPairings():
     reportMatch(id1, id2)
     reportMatch(id3, id4)
     pairings = swissPairings()
-    for item in pairings:
-        print str(item[0]) + ',' + str(item[1]) + ',' + str(item[2]) + ',' + str(item[3]) 
+    # for testing purpose ONLY
+    #for item in pairings:
+    #    print str(item[0]) + ',' + str(item[1]) + ',' + str(item[2]) + ',' + str(item[3]) 
+    # for testing purpose ONLY       
 
     if len(pairings) != 2:
         raise ValueError(
@@ -129,13 +131,13 @@ def testPairings():
 
 
 if __name__ == '__main__':
-    #testDeleteMatches()
-    #testDelete()
-    #testCount()
-    #testRegister()
-    #testRegisterCountDelete()
-    #testStandingsBeforeMatches()
-    #testReportMatches()
+    testDeleteMatches()
+    testDelete()
+    testCount()
+    testRegister()
+    testRegisterCountDelete()
+    testStandingsBeforeMatches()
+    testReportMatches()
     testPairings()
     print "Success!  All tests pass!"
 

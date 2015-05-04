@@ -3,6 +3,7 @@ The Movie Trailer Website project contains the following files:
 1. media.py: the class Movie definition
 2. my_movies.py: define various Movie instances 
 3. fresh_tomatoes.py: build the front-end for the Movie Trailer project
+4. images directory: contains all the movie poster images
 
 How to run the project?
 Method #1:
@@ -14,5 +15,6 @@ Method #2:
 Double-click my_movies.py for the directory of project1, this should populate the page from the browser.
 
 What attributes I have added for the Movies? 
-Release Year
 Genre
+Release Year
+
