@@ -11,14 +11,19 @@ DROP TABLE IF EXISTS players;
 -------- 1. TABLE -----------------------------------------------------------------------------
 \echo ' -- 1. Create Tables -- '
 -- create players table
-CREATE TABLE players ( name TEXT,                     
+-- Change History: 1. 05/04/2015: changed data type from TEXT to VARCHAR(75) for name
+CREATE TABLE players ( name VARCHAR(75),                     
                        id SERIAL primary key);
 
 -- create matches table
+-- Change History: 1. 05/04/2015: changed data type from SERIAL to INTEGER for player1, player2 and win_id (SERIAL will increase 1 each time it is created.)
+--                 2. 05/04/2015: the reason I chose to use both player1, player2 and win_id is that I first built the table, and inserted 
+--                                some testing data, which either player1 or player 2 can be the winner.  And it is relatively easy for me
+--                                to build the view later on.  Basically my design goal is that to keep all data retrival in database layer
 CREATE TABLE matches ( seq_id SERIAL primary key,
-					   player1 SERIAL references players(id),  
-					   player2 SERIAL references players(id),                   
-                       win_id SERIAL references players(id));
+					   player1 INTEGER references players(id),  
+					   player2 INTEGER references players(id),                   
+             win_id INTEGER references players(id));
 
 -------- 2. TABLE DATA ------------------------------------------------------------------------
 \echo ' -- 2. Insert Testing Data -- '
@@ -106,21 +111,25 @@ SELECT nextval('matches_seq_id_seq');
 --GROUP BY a.id, a.name, a.wins;
 
 -- create view standings to be used by playerStandings() and swissPairings()
+-- Change History: 1. 05/04/2015: added further comments:
+--                    a) columns of id, name, wins and player_match are used in playerStandings() 
+--                    b) column row_number is used in the query of swissPairings() to calculate 
+--                       whether the row is in odd or even number 
 CREATE OR REPLACE VIEW standings AS
-SELECT a.id, a.name, a.wins, SUM(player_cnt) AS player_match, ROW_NUMBER() OVER (ORDER BY a.wins DESC)
-FROM (
-	SELECT a.id, a.name, COUNT(b.win_id) AS wins
-  	  FROM players a LEFT JOIN matches b ON a.id = b.win_id
+SELECT a.id, a.name, a.wins, SUM(player_cnt) AS player_match, ROW_NUMBER() OVER (ORDER BY a.wins DESC) -- SUM to get the total matches count
+  FROM (
+	  SELECT a.id, a.name, COUNT(b.win_id) AS wins           -- wins count
+      FROM players a LEFT JOIN matches b ON a.id = b.win_id
   GROUP BY a.id, a.name, b.win_id
   ORDER BY wins) a LEFT JOIN (
-  	SELECT a.id, a.name, COUNT(b.player1) AS player_cnt
-	  FROM players a LEFT JOIN matches b ON a.id = b.player1
+  	SELECT a.id, a.name, COUNT(b.player1) AS player_cnt    -- player1 matches count
+	    FROM players a LEFT JOIN matches b ON a.id = b.player1
   GROUP BY a.id, a.name, b.player1
- 	 UNION
-	SELECT a.id, a.name, COUNT(b.player2) AS player_cnt
-	  FROM players a LEFT JOIN matches b ON a.id = b.player2
+ 	   UNION
+	  SELECT a.id, a.name, COUNT(b.player2) AS player_cnt    -- player2 matches count
+	    FROM players a LEFT JOIN matches b ON a.id = b.player2
   GROUP BY a.id, a.name, b.player2) b ON a.id = b.id
-  GROUP BY a.id, a.name, a.wins
-  ORDER BY a.wins DESC;
+GROUP BY a.id, a.name, a.wins
+ORDER BY a.wins DESC;
 
 SELECT * FROM standings;
