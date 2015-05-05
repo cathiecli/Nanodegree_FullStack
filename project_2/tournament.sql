@@ -4,12 +4,19 @@
 -- statements if you choose to use it.
 --
 
--- PostgreSQL: IF EXISTS - Do not throw an error if the table does not exist. A notice is issued in this case.
-DROP TABLE IF EXISTS matches;
-DROP TABLE IF EXISTS players;
+-- Change History: 1. 05/05/2015: changed to create database if exist, instead of tables
+-------- 1. DATABASE -----------------------------------------------------------------------------
+\echo ' -- 1. Create and connect to database -- '
+DROP DATABASE IF EXISTS tournament;
+CREATE DATABASE tournament;
+\c tournament
 
--------- 1. TABLE -----------------------------------------------------------------------------
-\echo ' -- 1. Create Tables -- '
+-- PostgreSQL: IF EXISTS - Do not throw an error if the table does not exist. A notice is issued in this case.
+-- DROP TABLE IF EXISTS matches;
+-- DROP TABLE IF EXISTS players;
+
+-------- 2. TABLE -----------------------------------------------------------------------------
+\echo ' -- 2. Create tables -- '
 -- create players table
 -- Change History: 1. 05/04/2015: changed data type from TEXT to VARCHAR(75) for name
 CREATE TABLE players ( name VARCHAR(75),                     
@@ -25,8 +32,8 @@ CREATE TABLE matches ( seq_id SERIAL primary key,
              winner_id INTEGER references players(id),  
              loser_id INTEGER references players(id));
 
--------- 2. TABLE DATA ------------------------------------------------------------------------
-\echo ' -- 2. Insert Testing Data -- '
+-------- 3. TABLE DATA ------------------------------------------------------------------------
+\echo ' -- 3. Insert Testing Data -- '
 -- insert data into players table
 --INSERT INTO players VALUES ('John', nextval('players_id_seq'));
 --INSERT INTO players VALUES ('Smith', nextval('players_id_seq'));
@@ -63,8 +70,8 @@ SELECT nextval('players_id_seq');
 
 SELECT nextval('matches_seq_id_seq');
 
--------- 3. VIEW ----------------------------------------------------------------------------
-\echo ' -- 3. Create View -- '
+-------- 4. VIEW ----------------------------------------------------------------------------
+\echo ' -- 4. Create View -- '
 -- Query to get the number of matches the player has won, used as a subquery in view
 --CREATE OR REPLACE VIEW player_standings AS
 --SELECT a.id, a.name, COUNT(b.winner_id) AS wins
