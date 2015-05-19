@@ -12,14 +12,9 @@ def connect():
 
 
 def deleteMatches():
-    """Remove all the match records from the database.
-
-    Change History:
-    1. 05/05/2015: changed to use variable for query
-    """
+    """Remove all the match records from the database."""
     conn = connect()
     c = conn.cursor()
-    """c.execute("DELETE FROM matches;")"""
     query = "DELETE FROM matches;"
     c.execute(query)
     conn.commit()
@@ -27,14 +22,9 @@ def deleteMatches():
 
 
 def deletePlayers():
-    """Remove all the player records from the database.
-
-    Change History:
-    1. 05/05/2015: changed to use variable for query
-    """
+    """Remove all the player records from the database."""
     conn = connect()
     c = conn.cursor()
-    """c.execute("DELETE FROM players;")"""
     query = "DELETE FROM players;"
     c.execute(query)
     conn.commit()
@@ -42,14 +32,9 @@ def deletePlayers():
 
 
 def countPlayers():
-    """Returns the number of players currently registered.
-
-    Change History:
-    1. 05/05/2015: changed to use variable for query
-    """
+    """Returns the number of players currently registered."""
     conn = connect()
     c = conn.cursor()
-    """c.execute("SELECT COUNT(*) FROM players;")"""
     query = "SELECT COUNT(*) FROM players;"
     c.execute(query)
     result = c.fetchone()
@@ -66,13 +51,9 @@ def registerPlayer(name):
 
     Args:
       name: the player's full name (need not be unique).
-
-    Change History:
-    1. 05/05/2015: changed to use two variables for query and pass-in parameter
     """
     conn = connect()
     c = conn.cursor()
-    """c.execute("INSERT INTO players (name) VALUES (%s)", (name,))"""
     query = "INSERT INTO players (name) VALUES (%s);"
     data = (name,)
     c.execute(query, data)
@@ -92,13 +73,9 @@ def playerStandings():
         name: the player's full name (as registered)
         wins: the number of matches the player has won
         matches: the number of matches the player has played
-
-    Change History:
-    1. 05/05/2015: changed to use variable for query
     """
     conn = connect()
     c = conn.cursor()
-    """c.execute('SELECT id, name, wins, player_match FROM standings;')"""
     query = "SELECT id, name, wins, player_match FROM standings;"
     c.execute(query)
     result = c.fetchall()
@@ -135,19 +112,9 @@ def swissPairings():
         name1: the first player's name
         id2: the second player's unique id
         name2: the second player's name
-
-    Change History:
-    1. 05/05/2015: changed to use variable for query
     """
     conn = connect()
     c = conn.cursor()
-    """c.execute('SELECT o.id AS id1, o.name AS name1,
-                         e.id AS id2, e.name AS name2 \
-                 FROM (SELECT * FROM standings
-                        WHERE MOD(row_number, 2) = 1) AS o, \
-                      (SELECT * FROM standings
-                        WHERE MOD(row_number, 2) = 0) AS e \
-                WHERE o.row_number + 1 = e.row_number;')"""
     query = "SELECT o.id AS id1, o.name AS name1, \
                     e.id AS id2, e.name AS name2 \
                  FROM (SELECT * FROM standings \

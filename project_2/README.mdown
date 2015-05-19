@@ -13,7 +13,7 @@ How to run the project?
 * *cd /vagrant/tournament*   -- navigate to the location of the tournament files
 
 2. Create database objects
-* *vagrant@vagrant-ubuntu-trusty-32:/vagrant/tournament$psql tournament*  -- login database  
+* *vagrant@vagrant-ubuntu-trusty-32:/vagrant/tournament$psql*  -- login database  
 * *tournament=>\i tournament.sql*   -- run the .sql script to create tables and views
 * *tournament=>\q*   -- exit database
 
